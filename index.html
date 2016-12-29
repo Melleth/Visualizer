@@ -9,46 +9,47 @@
         <meta name='viewport' content='width=device-width'/>
     </head>
     <body>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"></script>
+        <script src="three.min.js"></script>
         <script src ="grid.js"></script>
         <script>
-            var scene = new THREE.Scene();
-            var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-            var renderer = new THREE.WebGLRenderer();
-            renderer.setPixelRatio( window.devicePixelRatio );
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-            
-            var geometry = new THREE.BoxGeometry(1, 1, 1);
-            var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-            var cube = new THREE.Mesh(geometry, material);
-            camera.position.z = 75;
-            camera.position.x = 0;
-            camera.position.y = 0;
-            //scene.add(cube);
-            var meshGrid = new MeshGrid(100, 100, cube, scene);
-            scene.add(meshGrid.getMesh());
-            
-            var GridSpawner = function() {
-               if (meshGrid.meshGroup.position.z > camera.position.z) {
-                    meshGrid.randomGridColor();
-                    meshGrid.meshGroup.position.z = -200;
-               }
-            };
+            document.addEventListener("DOMContentLoaded", function(event) {
+                var scene = new THREE.Scene();
+                var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+                var renderer = new THREE.WebGLRenderer();
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+                
+                var geometry = new THREE.BoxGeometry(1, 1, 1);
+                var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+                var cube = new THREE.Mesh(geometry, material);
+                camera.position.z = 75;
+                camera.position.x = 0;
+                camera.position.y = 0;
+                
+                var meshGrid = new MeshGrid(100,100, cube, scene);
+                scene.add(meshGrid.getMesh());
+                
+                var GridSpawner = function() {
+                   if (meshGrid.meshGroup.position.z > camera.position.z) {
+                        meshGrid.randomGridColor();
+                        meshGrid.meshGroup.position.z = -200;
+                   }
+                };
 
-            //renderer loop
-            var counter = 0;
-            var render = function () {
-                requestAnimationFrame(render);
-                renderer.render(scene, camera);
-                GridSpawner();
-                meshGrid.WavePattern();
-                meshGrid.meshGroup.rotation.z += .01;
-                meshGrid.meshGroup.translateZ(1);
-            };
+                //renderer loop
+                var counter = 0;
+                var render = function () {
+                    requestAnimationFrame(render);
+                    renderer.render(scene, camera);
+                    GridSpawner();
+                    meshGrid.WavePattern();
+                    meshGrid.meshGroup.rotation.z += .01;
+                    meshGrid.meshGroup.translateZ(1);
+                };
 
-            render();
-           
+                render();
+          }); 
         </script>
     </body>
 </html>

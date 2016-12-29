@@ -1,4 +1,5 @@
 class MeshGrid {
+
     
     constructor (width, height, mesh, scene) {
         this.width = width;
@@ -6,6 +7,7 @@ class MeshGrid {
         this.meshGroup = new THREE.Group();
         this.rowSines = [];
         this.stepSize = 10*(1/height);
+        this.gridHue = 0;
         this.WaveHeight = 10;
         var sinusValue = 0;
         for (var i = 0; i < height; i++) {
@@ -19,20 +21,18 @@ class MeshGrid {
             for (var y = 0; y < height; y++) {
                 //Generate meshes
                 var meshCopy = mesh.clone();
+                meshCopy.material = new THREE.MeshBasicMaterial( {color: 0x00ff00 });
                 //console.log("creating cube at position: " + x + ", " + y);
                 meshCopy.translateX((-width/2) + x);
                 meshCopy.translateY((-height/2) + y);
-                meshCopy.translateZ(Math.sin(sine)*10);
-                //meshCopy.position.set(x,y,0);
+                meshCopy.translateZ(Math.sin(sine)*this.WaveHeight);
                 meshCopy.scale.set(0.5,0.5,0.5 );
-
-                //meshCopy.position.set(x,y,0);
-                //meshCopy.updateMatrix();
                 this.meshGroup.add(meshCopy);    
             }
             sine += .2;
         }
     }
+
 
     WavePattern() {
         for (var y = 0; y < this.height; y++) {
@@ -41,10 +41,13 @@ class MeshGrid {
                 var identifier = y*this.height + i;
                 this.meshGroup.children[identifier].position.z = Math.sin(this.rowSines[y]) * this.WaveHeight;
                 // Begin doing the math to change to bright colors on high altitude
-                var heightPct = (this.meshGroup.children[identifier].position.z + this.WaveHeight)/this.WaveHeight;
+                var heightPct = (this.meshGroup.children[identifier].position.z+this.WaveHeight)/(this.WaveHeight*2);
+                if (heightPct <= .02 )
+                    heightPct = .02;
+                else if (heightPct >= .8)
+                    heightPct =.8;
                 var hsl = this.meshGroup.children[identifier].material.color.getHSL();
-                this.meshGroup.children[identifier].material.color.setHSL(hsl.s, hsl.l, heightPct);
-                this.meshGroup.children[identifier].material.color.setHSL
+                this.meshGroup.children[identifier].material.color.setHSL(this.gridHue, 1, heightPct);
             }
         }
     }
@@ -54,11 +57,7 @@ class MeshGrid {
     }
 
     randomGridColor() {
-        this.meshGroup.children[1].material.color.setHex(Math.random() * 0xffffff);
-        //console.log(this.meshGroup.children[1213].material);
-        //for (var i = 0; this.meshGroup.children.length; i++) {
-           // console.log(i);
-            //meshGroup.children[i].material.color.setHex(Math.random()*0xffffff);
-        //}
+        this.gridHue = Math.random();
+        this.meshGroup.children[1].material.color.setHSL(this.gridHue, 1.0, 1.0);
     }
 }
