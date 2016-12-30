@@ -10,26 +10,32 @@
     </head>
     <body>
         <script src="three.min.js"></script>
+        <script src="SpawnableObject.js"></script>
         <script src ="grid.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", function(event) {
                 var scene = new THREE.Scene();
+                
                 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
                 var renderer = new THREE.WebGLRenderer();
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 document.body.appendChild(renderer.domElement);
                 
-                var geometry = new THREE.BoxGeometry(1, 1, 1);
+                var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+                //var geometry = new THREE.BufferGeometry();
+                //var geometry = new THREE.SphereGeometry( .5, 10, 10 );
+                //var geometry = new THREE.PlaneGeometry(1,1);
                 var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
                 var cube = new THREE.Mesh(geometry, material);
                 camera.position.z = 75;
                 camera.position.x = 0;
                 camera.position.y = 0;
                 
-                var meshGrid = new MeshGrid(100,100, cube, scene);
+                var meshGrid = new MeshGrid(75,75, cube, scene);
                 scene.add(meshGrid.getMesh());
-                
+                scene.fog = new THREE.Fog( 0x000000, 150, 300 );
+
                 var GridSpawner = function() {
                    if (meshGrid.meshGroup.position.z > camera.position.z) {
                         meshGrid.randomGridColor();
