@@ -10,7 +10,7 @@
     </head>
     <body>
         <script src="three.min.js"></script>
-        <script src="SpawnableObject.js"></script>
+        <script src="SpiralTrail.js"></script>
         <script src ="grid.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", function(event) {
@@ -31,27 +31,58 @@
                 camera.position.z = 75;
                 camera.position.x = 0;
                 camera.position.y = 0;
-                
+                // Declare and initialize variables that are used in the spawn sequence
                 var meshGrid = new MeshGrid(75,75, cube, scene);
+                meshGrid.meshGroup.visible = false;
                 scene.add(meshGrid.getMesh());
+                
+                var spiralTrail = new SpiralTrail(1000,10);
+                spiralTrail.particleSystem.visible = false;
+                scene.add(spiralTrail.particleSystem);
                 scene.fog = new THREE.Fog( 0x000000, 150, 300 );
-
-                var GridSpawner = function() {
-                   if (meshGrid.meshGroup.position.z > camera.position.z) {
-                        meshGrid.randomGridColor();
-                        meshGrid.meshGroup.position.z = -200;
-                   }
+                var gridHandler = function() {
+                    if (!meshGrid.meshGroup.visible)
+                        meshGrid.meshGroup.visible = true;
+                    meshGrid.WavePattern();
+                    meshGrid.meshGroup.rotation.z += .01;
+                    meshGrid.meshGroup.translateZ(2);
+                    if (meshGrid.meshGroup.position.z > camera.position.z) {
+                         meshGrid.randomGridColor();
+                         meshGrid.meshGroup.position.z = -200;
+                         meshGrid.meshGroup.visible = false;
+                         spawnMode = 0;
+                    }
                 };
 
+                var trailHandler = function() {
+                    if (!spiralTrail.particleSystem.visible)
+                        spiralTrail.particleSystem.visible = true;
+                    spiralTrail.particleSystem.translateZ(10);
+                    spiralTrail.particleSystem.material.color.setHex( Math.random() * 0xffffff);
+                    if (spiralTrail.particleSystem.position.z > camera.position.z) {
+                        spiralTrail.particleSystem.position.z = -1*spiralTrail.length - 200;
+                        spawnMode = 1;
+                    }
+                };
+                
+                var spawnMode = 0;
+                var SpawnManager = function() {
+                   switch(spawnMode) {
+                        case 0:
+                            trailHandler();
+                            break;
+                        case 1:
+                            gridHandler();
+                            break;
+                   }
+                };
                 //renderer loop
                 var counter = 0;
                 var render = function () {
                     requestAnimationFrame(render);
                     renderer.render(scene, camera);
-                    GridSpawner();
-                    meshGrid.WavePattern();
-                    meshGrid.meshGroup.rotation.z += .01;
-                    meshGrid.meshGroup.translateZ(1);
+                    SpawnManager();
+
                 };
 
                 render();

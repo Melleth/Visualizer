@@ -31,8 +31,11 @@ class MeshGrid {
             }
             sine += .2;
         }
+        // set position to negative so we can fade in through the fog
+        this.meshGroup.position.z = -200;
+        console.log(this.meshGroup.position.z);
+        console.log("henk");
     }
-
 
     WavePattern() {
         for (var y = 0; y < this.height; y++) {
